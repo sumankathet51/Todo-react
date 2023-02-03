@@ -1,32 +1,68 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { FormEvent, useState } from 'react'
+import reactLogo from './assets/react.svg';
+import Container from './components/container/Container';
+import InputContainer from './components/input/InputContainer';
+import Summary from './components/summary/Summary';
+import Tasks from './components/tasks/Tasks';
+
+import './css/style.css';
+
+export interface Task {
+  name: string;
+  done: boolean;
+}
+
+const initalTasks = [
+  {
+    name: 'Task 1',
+    done: false,
+  },
+  {
+    name: 'Task 2',
+    done: true,
+  },
+]
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [tasks, setTask] = useState<Task[]>(initalTasks)
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>, value: string) => {
+    e.preventDefault()
+    setTask([...tasks, { name: value, done: false }])
+  }
+
+  const handleTaskDone = (index: number, done: boolean) => {
+    console.log(index, done)
+    setTask((tasks) =>
+      tasks.map((task, i) => 
+      {
+          if (i === index) {
+            task.done = done
+          }
+          return task
+        }
+    ))
+  }
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="flex justify-center m-5">
+      <div className='flex flex-col items-center'>
+        <div className='sm:w-[640px] border shadow p-10 flex flex-col gap-10'>
+
+          <Container title={'Summary'}>
+            <Summary tasks={tasks} />
+          </Container>
+
+          <Container>
+            <InputContainer handleSubmit={handleSubmit} />
+          </Container>
+
+          <Container title={'Tasks'}>
+            <Tasks tasks={tasks} handleTaskDone={handleTaskDone} />
+          </Container>
+
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </div>
   )
 }
